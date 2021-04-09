@@ -27,6 +27,12 @@ version '1.0-SNAPSHOT'
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+
+    compile('org.projectlombok:lombok')
+    testCompile('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+
+    testImplementation('org.assertj:assertj-core')
 }
 
 test {
