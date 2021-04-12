@@ -32,6 +32,10 @@ dependencies {
     testCompile('org.projectlombok:lombok')
     annotationProcessor('org.projectlombok:lombok')
 
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('com.h2database:h2')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+
     testImplementation('org.assertj:assertj-core')
     testImplementation('org.hamcrest:hamcrest')
 }
