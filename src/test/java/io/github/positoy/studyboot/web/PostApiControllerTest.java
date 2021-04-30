@@ -2,7 +2,9 @@ package io.github.positoy.studyboot.web;
 
 import io.github.positoy.studyboot.web.domain.posts.Post;
 import io.github.positoy.studyboot.web.domain.posts.PostRepository;
+import io.github.positoy.studyboot.web.dto.PostResponseDto;
 import io.github.positoy.studyboot.web.dto.PostSaveRequestDto;
+import io.github.positoy.studyboot.web.dto.PostUpdateRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,5 +59,47 @@ class PostApiControllerTest {
         assertThat(all.get(0).getTitle()).isEqualTo(title);
         assertThat(all.get(0).getContent()).isEqualTo(content);
         assertThat(all.get(0).getAuthor()).isEqualTo(author);
+    }
+
+    @Test
+    void Post_읽어온다() {
+        Post savedPost = postRepository.save(Post.builder()
+                .title("제목")
+                .content("내용")
+                .author("글쓴이")
+                .build());
+
+        String url = "http://localhost:" + port + "/api/v1/posts/1";
+        ResponseEntity<PostResponseDto> responseEntity = restTemplate.getForEntity(url, PostResponseDto.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().getTitle()).isEqualTo(savedPost.getTitle());
+        assertThat(responseEntity.getBody().getContent()).isEqualTo(savedPost.getContent());
+        assertThat(responseEntity.getBody().getAuthor()).isEqualTo(savedPost.getAuthor());
+    }
+
+    @Test
+    void Post_수정된다() {
+        Post savedPost = postRepository.save(Post.builder()
+                .title("제목")
+                .content("내용")
+                .author("글쓴이")
+                .build());
+
+        String newTitle = "변경된 제목";
+        String newContent = "변경된 내용";
+        PostUpdateRequestDto dto = PostUpdateRequestDto.builder()
+                .title(newTitle)
+                .content(newContent)
+                .build();
+        String url = "http://localhost:" + port + "/api/v1/posts/" + savedPost.getId();
+        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(url, dto, Long.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isEqualTo(savedPost.getId());
+
+        Post post = postRepository.findById(savedPost.getId()).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + savedPost.getId()));
+        assertThat(post.getTitle()).isEqualTo(newTitle);
+        assertThat(post.getContent()).isEqualTo(newContent);
     }
 }
